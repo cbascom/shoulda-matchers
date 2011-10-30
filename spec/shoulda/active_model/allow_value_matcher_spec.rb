@@ -10,12 +10,22 @@ describe Shoulda::Matchers::ActiveModel::AllowValueMatcher do
       @model = Example.new
     end
 
-    it "should allow a good value" do
+    it "should pass with a good value when using should" do
       @model.should allow_value("abcde").for(:attr)
     end
 
-    it "should not allow a bad value" do
+    it "should fail with a bad value when using should" do
+      expect { @model.should allow_value('xyz').for(:attr) }.
+        to raise_error(RSpec::Expectations::ExpectationNotMetError)
+    end
+
+    it "should pass with a bad value when using should_not" do
       @model.should_not allow_value("xyz").for(:attr)
+    end
+
+    it "should fail with a good value when using should_not" do
+      expect { @model.should_not allow_value('abcde').for(:attr) }.
+        to raise_error(RSpec::Expectations::ExpectationNotMetError)
     end
   end
 
@@ -27,12 +37,59 @@ describe Shoulda::Matchers::ActiveModel::AllowValueMatcher do
       @model = Example.new
     end
 
-    it "should allow a good value" do
+    it "should pass with a good value when using should" do
+      @model.should allow_value('abcde').for(:attr)
+    end
+
+    it "should pass with a good value and matching message when using should" do
       @model.should allow_value('abcde').for(:attr).with_message(/bad/)
     end
 
-    it "should not allow a bad value" do
+    it "should pass with a good value and non-matching message when using should" do
+      @model.should allow_value('abcde').for(:attr).with_message(/bogus/)
+    end
+
+    it "should fail with a bad value when using should" do
+      expect { @model.should allow_value('xyz').for(:attr) }.
+        to raise_error(RSpec::Expectations::ExpectationNotMetError)
+    end
+
+    it "should fail with a bad value and matching message when using should" do
+      expect { @model.should allow_value('xyz').for(:attr).with_message(/bad/) }.
+        to raise_error(RSpec::Expectations::ExpectationNotMetError)
+    end
+
+    it "should fail with a bad value and non-matching message when using should" do
+      expect { @model.should allow_value('xyz').for(:attr).with_message(/bogus/) }.
+        to raise_error(RSpec::Expectations::ExpectationNotMetError)
+    end
+
+    it "should pass with a bad value when using should_not" do
+      @model.should_not allow_value('xyz').for(:attr)
+    end
+
+    it "should pass with a bad value and matching message when using should_not" do
       @model.should_not allow_value('xyz').for(:attr).with_message(/bad/)
+    end
+
+    it "should fail with a bad value and non-matching message when using should_not" do
+      expect { @model.should_not allow_value('xyz').for(:attr).with_message(/bogus/) }.
+        to raise_error(RSpec::Expectations::ExpectationNotMetError)
+    end
+
+    it "should fail with a good value when using should_not" do
+      expect { @model.should_not allow_value('abcde').for(:attr) }.
+        to raise_error(RSpec::Expectations::ExpectationNotMetError)
+    end
+
+    it "should fail with a good value and matching message when using should_not" do
+      expect { @model.should_not allow_value('abcde').for(:attr).with_message(/bad/) }.
+        to raise_error(RSpec::Expectations::ExpectationNotMetError)
+    end
+
+    it "should fail with a good value and non-matching message when using should_not" do
+      expect { @model.should_not allow_value('abcde').for(:attr).with_message(/bogus/) }.
+        to raise_error(RSpec::Expectations::ExpectationNotMetError)
     end
   end
 
@@ -47,13 +104,13 @@ describe Shoulda::Matchers::ActiveModel::AllowValueMatcher do
       @model = Example.new
     end
 
-    it "should allow a good value" do
+    it "should pass with a good value when using should" do
       @model.should allow_value("12345").for(:attr)
     end
 
     bad_values = [nil, "", "abc", "0", "50001", "123456"]
     bad_values.each do |value|
-      it "should not allow a bad value (#{value.inspect})" do
+      it "should pass with bad value (#{value.inspect}) when using should_not" do
         @model.should_not allow_value(value).for(:attr)
       end
     end

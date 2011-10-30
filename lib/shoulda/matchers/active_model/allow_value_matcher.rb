@@ -36,11 +36,20 @@ module Shoulda # :nodoc:
 
         def matches?(instance)
           @instance = instance
+          @instance.send("#{@attribute}=", @value)
+          @instance.valid?
+          !has_errors?
+        end
+
+        def does_not_match?(instance)
+          @instance = instance
+          @instance.send("#{@attribute}=", @value)
+          @instance.valid?
           if Symbol === @expected_message
             @expected_message = default_error_message(@expected_message)
           end
-          @instance.send("#{@attribute}=", @value)
-          !errors_match?
+          return false if !has_errors?
+          errors_match?
         end
 
         def failure_message
@@ -57,11 +66,15 @@ module Shoulda # :nodoc:
 
         private
 
-        def errors_match?
+        def has_errors?
           @instance.valid?
           @errors = errors_for_attribute(@instance, @attribute)
           @errors = [@errors] unless @errors.is_a?(Array)
-          @expected_message ? (errors_match_regexp? || errors_match_string?) : (@errors.compact.any?)
+          @errors.compact.any?
+        end
+
+        def errors_match?
+          @expected_message ? (errors_match_regexp? || errors_match_string?) : true
         end
 
         def errors_for_attribute(instance, attribute)
